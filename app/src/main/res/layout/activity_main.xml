@@ -10,16 +10,22 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <TextView
-            android:id="@+id/textView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="TextView" />
+        <SurfaceView
+            android:layout_width="1px"
+            android:layout_height="1px"
+            android:id="@+id/cameraView"/>
+
+        <!--<TextView-->
+            <!--android:id="@+id/textView"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_below="@id/cameraView"-->
+            <!--android:text="TextView" />-->
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/textView"
+            android:layout_below="@id/cameraView"
             android:id="@+id/taskText"/>
 
         <LinearLayout

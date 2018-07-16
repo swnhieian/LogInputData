@@ -90,10 +90,11 @@ class LogUtil {
         }
     }
 
+    public static String recordPath = "";
     public static void init() { // create log file to write
         Date timeNow = new Date();
         CharSequence timeS = android.text.format.DateFormat.format("yy-MM-dd-HH-mm-ss-", timeNow.getTime());
-        String timeStr = timeS.toString() + Config.posture + ".txt";
+        String timeStr = timeS.toString() + Config.mode + ".txt";
         //String timeStr = String.format(Locale.CHINA, "%tm-%te-%tH-%tM-%tS.txt", timeNow);
         String filePath = Environment.getExternalStorageDirectory().getAbsolutePath();
         String folderName = "gazeLog";
@@ -114,7 +115,9 @@ class LogUtil {
                 file.createNewFile();
             }
             writer = new BufferedWriter(new FileWriter(file));
-            fileName = filePath + File.separatorChar+ folderName + File.separatorChar + timeS.toString() + Config.posture + "-sensor.txt";
+            fileName = filePath + File.separatorChar+ folderName + File.separatorChar + timeS.toString() + Config.mode + "-sensor.txt";
+            recordPath = filePath + File.separatorChar+ folderName + File.separatorChar + timeS.toString() + "-record.mp4";
+
             file = new File(fileName);
             if (!file.exists()) {
                 file.createNewFile();
