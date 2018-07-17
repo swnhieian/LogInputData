@@ -343,13 +343,6 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         //Collections.shuffle(english_phrases);
         Collections.shuffle(chinese_phrases);
         updateUI();
-        if (Config.mode == Config.Mode.Normal) {
-            editText.setInputType(InputType.TYPE_TEXT_VARIATION_WEB_PASSWORD);
-            editText.setTransformationMethod(PasswordTransformationMethod.getInstance());
-        } else {
-            editText.setInputType(InputType.TYPE_CLASS_TEXT);
-            editText.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
-        }
         return super.onOptionsItemSelected(item);
     }
 
@@ -385,6 +378,13 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
 
     private void updateUI() {
         setTitle("Mode:" + Config.mode + "(" +  (currentTaskNo+1) + "/" + Config.totalTaskNo + ")");
+        if (Config.mode == Config.Mode.Random) {
+            editText.setInputType(InputType.TYPE_TEXT_VARIATION_WEB_PASSWORD);
+            editText.setTransformationMethod(PasswordTransformationMethod.getInstance());
+        } else {
+            editText.setInputType(InputType.TYPE_CLASS_TEXT);
+            editText.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
+        }
     }
 
     public void startLog(View v) {
