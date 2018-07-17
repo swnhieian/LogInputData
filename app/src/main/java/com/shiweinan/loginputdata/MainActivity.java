@@ -358,8 +358,8 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         Random rand = new Random();
         String res = "";
         String symbols = "!@#$%^&*()-=_+<>;'\",.?/~";
-        //generate a random string len: 6 - 8
-        int len = 6 + rand.nextInt(3);
+        //generate a random string len: 5 - 8
+        int len = 5 + rand.nextInt(3);
         for (int i=0; i<len; i++) {
             int mode = rand.nextInt(8);
             if (mode == 0 || mode == 1 || mode == 2 || mode ==3 || mode == 4) {
@@ -374,11 +374,13 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
     }
 
     private void updateUI() {
-        setTitle(Config.mode + "(" +  (currentTaskNo+1) + "/" + Config.totalTaskNo + ")");
+        
         if (Config.mode == Config.Mode.Random) {
+            setTitle(Config.mode + "(" +  (currentTaskNo+1) + "/" + Config.totalTaskNoRandom + ")");
             editText.setInputType(InputType.TYPE_TEXT_VARIATION_WEB_PASSWORD);
             editText.setTransformationMethod(PasswordTransformationMethod.getInstance());
         } else {
+            setTitle(Config.mode + "(" +  (currentTaskNo+1) + "/" + Config.totalTaskNo + ")");
             editText.setInputType(InputType.TYPE_CLASS_TEXT);
             editText.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
         }
@@ -435,13 +437,18 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         }
     }
     public void nextTask() {
-        if (currentTaskNo + 1 == Config.totalTaskNo) {
-            stopTask();
-        }
-        currentTaskNo = (currentTaskNo + 1) % Config.totalTaskNo;
+        
         if (Config.mode != Config.Mode.Random) {
+            if (currentTaskNo + 1 == Config.totalTaskNo) {
+                stopTask();
+            }
+            currentTaskNo = (currentTaskNo + 1) % Config.totalTaskNo;
             currentTask = chinese_phrases.get(currentTaskNo).trim();
         } else {
+            if (currentTaskNo + 1 == Config.totalTaskNoRandom) {
+                stopTask();
+            }
+            currentTaskNo = (currentTaskNo + 1) % Config.totalTaskNoRandom;
             currentTask = generateRandomTask();
         }
         taskText.setText(currentTask);

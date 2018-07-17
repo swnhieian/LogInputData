@@ -98,7 +98,7 @@ class LogUtil {
         String timeStr = timeS.toString() + Config.mode + ".txt";
         //String timeStr = String.format(Locale.CHINA, "%tm-%te-%tH-%tM-%tS.txt", timeNow);
         String filePath = Environment.getExternalStorageDirectory().getAbsolutePath();
-        String folderName = "gazeLog";
+        String folderName = "gazeLog" + File.separatorChar + timeS.toString() + Config.mode;
         try {
             String fileName = filePath + File.separatorChar;
             File file = new File(fileName);
@@ -110,15 +110,15 @@ class LogUtil {
             if (!file.exists()) {
                 file.mkdir();
             }
-            fileName = fileName + timeStr;
+            fileName = fileName + "input.txt";
             file = new File(fileName);
             if (!file.exists()) {
                 file.createNewFile();
             }
             writer = new BufferedWriter(new FileWriter(file));
-            fileName = filePath + File.separatorChar+ folderName + File.separatorChar + timeS.toString() + Config.mode + "-sensor.txt";
-            recordPath = filePath + File.separatorChar+ folderName + File.separatorChar + timeS.toString() + "-record.mp4";
-            screenRecordPath = filePath + File.separatorChar + folderName + File.separatorChar + timeS.toString() + "-screen.mp4";
+            fileName = filePath + File.separatorChar+ folderName + File.separatorChar + "input-sensor.txt";
+            recordPath = filePath + File.separatorChar+ folderName + File.separatorChar + "record.mp4";
+            screenRecordPath = filePath + File.separatorChar + folderName + File.separatorChar + "screen.mp4";
             file = new File(fileName);
             if (!file.exists()) {
                 file.createNewFile();
