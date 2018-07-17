@@ -4,6 +4,7 @@ package com.shiweinan.loginputdata;
 import android.Manifest;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -12,9 +13,14 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.hardware.display.DisplayManager;
+import android.hardware.display.VirtualDisplay;
 import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
+import android.media.projection.MediaProjection;
+import android.media.projection.MediaProjectionManager;
 import android.os.SystemClock;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -25,6 +31,9 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
+import android.text.method.HideReturnsTransformationMethod;
+import android.text.method.PasswordTransformationMethod;
+import android.util.DisplayMetrics;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SurfaceHolder;
@@ -74,6 +83,10 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
     private Timer timer;
     private TimerTask task;
     private MediaRecorder mediaRecorder;
+    private MediaProjectionManager projectionManager;
+    private MediaProjection mediaProjection;
+    private boolean screenRecording = false;
+    private int width, height, dpi;
 
 
     long bootTime() {
@@ -165,7 +178,75 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         manager.registerListener(listener, gyro, SensorManager.SENSOR_DELAY_GAME);
         manager.registerListener(listener, mag, SensorManager.SENSOR_DELAY_GAME);
 
+        DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
+        height = displayMetrics.heightPixels;
+        width = displayMetrics.widthPixels;
+        dpi = displayMetrics.densityDpi;
+        projectionManager = (MediaProjectionManager)getSystemService(MEDIA_PROJECTION_SERVICE);
+        Intent captureIntent = projectionManager.createScreenCaptureIntent();
+        startActivityForResult(captureIntent, 0);
+
     }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == 0 && resultCode == RESULT_OK) {
+            mediaProjection = projectionManager.getMediaProjection(resultCode, data);
+        }
+    }
+
+    private void createVirtualDisaplay() {
+        VirtualDisplay virtualDisplay = mediaProjection.createVirtualDisplay(
+                "MainScreen",
+                width,
+                height,
+                dpi,
+                DisplayManager.VIRTUAL_DISPLAY_FLAG_AUTO_MIRROR,
+                mediaRecorder.getSurface(),
+                null, null);
+    }
+
+    private void initRecorder() {
+        if (mediaRecorder == null) {
+            mediaRecorder = new MediaRecorder();
+            //mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+            mediaRecorder.setVideoSource(MediaRecorder.VideoSource.SURFACE);
+            mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+            mediaRecorder.setVideoSize(width, height);
+            mediaRecorder.setOutputFile(LogUtil.screenRecordPath);
+            mediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
+            //mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+            mediaRecorder.setVideoEncodingBitRate(5 * 1024 * 1024);
+            mediaRecorder.setVideoFrameRate(30);
+        }
+        try {
+            mediaRecorder.prepare();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void startRecordScreen() {
+        if (mediaProjection == null || screenRecording) {
+            return;
+        }
+
+        initRecorder();
+        createVirtualDisaplay();
+        mediaRecorder.start();
+        screenRecording = true;
+    }
+
+    public void stopRecordScreen() {
+        if (!screenRecording) {
+            return;
+        }
+        if (mediaRecorder != null) {
+            mediaRecorder.stop();
+        }
+        screenRecording = false;
+        mediaRecorder = null;
+    }
+
 
     private void loadPhrases() {
         BufferedReader reader = new BufferedReader(new InputStreamReader(this.getResources().openRawResource(R.raw.msg)));
@@ -262,6 +343,13 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         //Collections.shuffle(english_phrases);
         Collections.shuffle(chinese_phrases);
         updateUI();
+        if (Config.mode == Config.Mode.Normal) {
+            editText.setInputType(InputType.TYPE_TEXT_VARIATION_WEB_PASSWORD);
+            editText.setTransformationMethod(PasswordTransformationMethod.getInstance());
+        } else {
+            editText.setInputType(InputType.TYPE_CLASS_TEXT);
+            editText.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
+        }
         return super.onOptionsItemSelected(item);
     }
 
@@ -310,6 +398,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
             //bar.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#ff0000")));
             //note startLog after LogUtil.init()
             startRecord();
+            startRecordScreen();
         } else {
            stopTask();
         }
@@ -326,6 +415,9 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
             //android.support.v7.app.ActionBar bar = getSupportActionBar();
             //bar.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#0000ff")));
             stopRecord();
+            stopRecordScreen();
+
+
         }
     }
     public void resetInput() {
@@ -479,11 +571,13 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
 
     private void stopRecord() {
         if (mMediaRecorder != null) {
+           // mMediaRecorder.release();
             mMediaRecorder.stop();
         }
         if (mCamera != null) {
             mCamera.lock();
         }
+        mMediaRecorder = null;
     }
 
 

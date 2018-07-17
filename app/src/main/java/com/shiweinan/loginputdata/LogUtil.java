@@ -91,6 +91,7 @@ class LogUtil {
     }
 
     public static String recordPath = "";
+    public static String screenRecordPath = "";
     public static void init() { // create log file to write
         Date timeNow = new Date();
         CharSequence timeS = android.text.format.DateFormat.format("yy-MM-dd-HH-mm-ss-", timeNow.getTime());
@@ -117,7 +118,7 @@ class LogUtil {
             writer = new BufferedWriter(new FileWriter(file));
             fileName = filePath + File.separatorChar+ folderName + File.separatorChar + timeS.toString() + Config.mode + "-sensor.txt";
             recordPath = filePath + File.separatorChar+ folderName + File.separatorChar + timeS.toString() + "-record.mp4";
-
+            screenRecordPath = filePath + File.separatorChar + folderName + File.separatorChar + timeS.toString() + "-screen.mp4";
             file = new File(fileName);
             if (!file.exists()) {
                 file.createNewFile();
