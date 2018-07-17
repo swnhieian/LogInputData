@@ -358,18 +358,15 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         Random rand = new Random();
         String res = "";
         String symbols = "!@#$%^&*()-=_+<>;'\",.?/~";
-        //generate a random string len: 6 - 10
-        int len = 6 + rand.nextInt(5);
+        //generate a random string len: 6 - 8
+        int len = 6 + rand.nextInt(3);
         for (int i=0; i<len; i++) {
-            int mode = rand.nextInt(4);//0: a-z, 1: A-Z, 2: !@#$%^&*()-=_+<>;'",.?/~ 3:0-9
-            if (mode == 0) {
+            int mode = rand.nextInt(8);
+            if (mode == 0 || mode == 1 || mode == 2 || mode ==3 || mode == 4) {
                 res += (char)('a' + rand.nextInt(26));
-            } else if (mode == 1) {
-                res += (char)('A' + rand.nextInt(26));
-            } else if (mode == 2) {
+            } else if (mode == 5) {
                 res += symbols.charAt(rand.nextInt(symbols.length()));
             } else {
-                assert (mode == 3);
                 res += rand.nextInt(10);
             }
         }
@@ -377,7 +374,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
     }
 
     private void updateUI() {
-        setTitle("Mode:" + Config.mode + "(" +  (currentTaskNo+1) + "/" + Config.totalTaskNo + ")");
+        setTitle(Config.mode + "(" +  (currentTaskNo+1) + "/" + Config.totalTaskNo + ")");
         if (Config.mode == Config.Mode.Random) {
             editText.setInputType(InputType.TYPE_TEXT_VARIATION_WEB_PASSWORD);
             editText.setTransformationMethod(PasswordTransformationMethod.getInstance());
